@@ -6,10 +6,7 @@
       "command": "host start",
       "problemMatcher": "$func-watch",
       "dependsOn": "func: extensions install",
-      "isBackground": true,
-      "options": {
-        "cwd": "${workspaceFolder}/src\\blacklist-check-api"
-      }
+      "isBackground": true
     }
   ]
 }
