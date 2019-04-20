@@ -3,6 +3,10 @@ var crypto = require('crypto');
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
+    // we're expecting a JSON object body to be POSTed to this function.
+    // that JSON object will have just one member
+    // { "password": "..." }
+
     if (req.body && req.body.password) {
         const password = req.body.password;
 
@@ -14,8 +18,11 @@ module.exports = async function (context, req) {
 
         // retrieve the pwned password hash suffixes for this prefix.
         var candidates = await getContent('https://api.pwnedpasswords.com/range/' + shaPrefix);
+        // now see if ours is in there.
         var foundAt = candidates.indexOf(shaSuffix);
         if(foundAt >= 0) {
+            // if so, this password has been pwned and therefore isn't allowed.
+            // return a 409 status code so that the Azure B2C Validation technical profile will fail.
             context.res = {
                 status: 409
             }
@@ -25,18 +32,7 @@ module.exports = async function (context, req) {
                 status: 200
             }
         }
-/*
-        if(password === "123456") {
-            context.res = {
-                status: 409
-            }
-        }
-        else {
-            context.res = {
-                status: 200
-            }
-        }
-*/
+
     }
     else {
         context.res = {
