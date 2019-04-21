@@ -55,22 +55,37 @@
       </TechnicalProfiles>
     </ClaimsProvider>
 
-    <ClaimsProvider>
+     <ClaimsProvider>
       <DisplayName>Local Account</DisplayName>
       <TechnicalProfiles>
         <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail">
-            <DisplayName>Email signup</DisplayName>
+          <DisplayName>Email signup</DisplayName>
+          <ValidationTechnicalProfiles>
+            <!--
+            Placing this ValidationTechnicalProfile here in the extensions file appears to _INSERT_ it
+            before the AAD-UserWriteUsingLogonEmail ValidationTechnicalProfile defined in the base file.
+            -->
+            <ValidationTechnicalProfile ReferenceId="API-AllowedPassword"/>
+          </ValidationTechnicalProfiles>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <ClaimsProvider>
+      <DisplayName>Local Account</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="LocalAccountWritePasswordUsingObjectId">
+          <DisplayName>Change password (username)</DisplayName>
             <ValidationTechnicalProfiles>
-              <!--
-              TODO: How can we _INSERT_ the API call into the ValidationTechnicalProfiles 
-              without causing the AADUserWriteUsingLogonEmail to attempt to run twice?
-              -->
-              <ValidationTechnicalProfile ReferenceId="API-AllowedPassword"/>
-              <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail"/>
-            </ValidationTechnicalProfiles>
-          </TechnicalProfile>
-        </TechnicalProfiles>
-      </ClaimsProvider>
+            <!--
+            Placing this ValidationTechnicalProfile here in the extensions file appears to _INSERT_ it
+            before the AAD-UserWritePasswordUsingObjectId ValidationTechnicalProfile defined in the base file.
+            -->
+            <ValidationTechnicalProfile ReferenceId="API-AllowedPassword"/>
+          </ValidationTechnicalProfiles>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
   </ClaimsProviders>
 
     <!--UserJourneys>

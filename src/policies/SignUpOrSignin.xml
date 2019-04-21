@@ -6,7 +6,9 @@
   PolicySchemaVersion="0.3.0.0"
   TenantId="{{tenant}}"
   PolicyId="B2C_1A_passwordblacklist_signup_signin"
-  PublicPolicyUri="http://{{tenant}}/B2C_1A_passwordblacklist_signup_signin">
+  PublicPolicyUri="http://{{tenant}}/B2C_1A_passwordblacklist_signup_signin"
+  DeploymentMode="Development"
+  UserJourneyRecorderEndpoint="urn:journeyrecorder:applicationinsights">
 
   <BasePolicy>
     <TenantId>{{tenant}}</TenantId>
@@ -15,6 +17,9 @@
 
   <RelyingParty>
     <DefaultUserJourney ReferenceId="SignUpOrSignIn" />
+    <UserJourneyBehaviors>
+      <JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="17e022e4-a214-469f-937d-06eb98c0f2d4" DeveloperMode="true" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
+    </UserJourneyBehaviors>
     <TechnicalProfile Id="PolicyProfile">
       <DisplayName>PolicyProfile</DisplayName>
       <Protocol Name="OpenIdConnect" />
