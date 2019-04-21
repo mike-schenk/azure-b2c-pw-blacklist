@@ -14,10 +14,15 @@
   </BasePolicy>
   <BuildingBlocks>
 
+    <ClaimsSchema>
+      <ClaimType Id="blockedPasswordMessage">
+        <DataType>string</DataType>
+      </ClaimType>
+    </ClaimsSchema>
+
   </BuildingBlocks>
 
   <ClaimsProviders>
-
 
     <ClaimsProvider>
       <DisplayName>Local Account SignIn</DisplayName>
@@ -49,6 +54,7 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="newPassword" PartnerClaimType="password" />
+            <!--InputClaim ClaimTypeReferenceId="blockedPasswordMessage" PartnerClaimType="failMessage" DefaultValue="That password is insecure because it has been disclosed. Please try another." / -->
           </InputClaims>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>

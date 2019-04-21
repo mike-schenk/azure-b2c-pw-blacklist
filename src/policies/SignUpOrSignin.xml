@@ -17,9 +17,9 @@
 
   <RelyingParty>
     <DefaultUserJourney ReferenceId="SignUpOrSignIn" />
-    <UserJourneyBehaviors>
+    <!-- UserJourneyBehaviors>
       <JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="17e022e4-a214-469f-937d-06eb98c0f2d4" DeveloperMode="true" ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
-    </UserJourneyBehaviors>
+    </UserJourneyBehaviors -->
     <TechnicalProfile Id="PolicyProfile">
       <DisplayName>PolicyProfile</DisplayName>
       <Protocol Name="OpenIdConnect" />

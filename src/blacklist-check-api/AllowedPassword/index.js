@@ -24,9 +24,12 @@ module.exports = async function (context, req) {
         if(foundAt >= 0) {
             // if so, this password has been pwned and therefore isn't allowed.
             // return a 409 status code so that the Azure B2C Validation technical profile will fail.
+            let userMessage = "That password is too common or easy to guess. Please try another.";
+            if(req.body.failMessage)
+                userMessage = req.body.failMessage;
             context.res = {
                 status: 409,
-                body: {"version": "1.0.0", "status": 409, "userMessage": "That password is unsafe. Please try another."}
+                body: {"version": "1.0.0", "status": 409, "userMessage": userMessage}
             }
         }
         else {
