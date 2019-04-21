@@ -1,13 +1,14 @@
 var crypto = require('crypto');
 
 module.exports = async function (context, req) {
-    context.log('JavaScript HTTP trigger function processed a request.');
+    context.log('JavaScript HTTP trigger function received a request.');
 
     // we're expecting a JSON object body to be POSTed to this function.
     // that JSON object will have just one member
     // { "password": "..." }
 
     if (req.body && req.body.password) {
+        context.log('Request has a body with a password.');
         const password = req.body.password;
 
         var sha1Hasher = crypto.createHash('sha1');
@@ -24,7 +25,8 @@ module.exports = async function (context, req) {
             // if so, this password has been pwned and therefore isn't allowed.
             // return a 409 status code so that the Azure B2C Validation technical profile will fail.
             context.res = {
-                status: 409
+                status: 409,
+                body: {"version": "1.0.0", "status": 409, "userMessage": "That password is unsafe. Please try another."}
             }
         }
         else {
@@ -35,6 +37,7 @@ module.exports = async function (context, req) {
 
     }
     else {
+        context.log('request does not have a body, or does not have a password');
         context.res = {
             status: 400,
             body: "Submit a password in the request body"
