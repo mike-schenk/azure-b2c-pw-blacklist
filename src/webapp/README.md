@@ -1,83 +1,221 @@
-#Azure Active Directory OIDC Web Sample
+---
+services: active-directory-b2c
+platforms: dotnet
+author: dstrockis
+---
 
-This Node.js app will give you with a quick and easy way to set up a Web application in node.js with Express using OpenID Connect. The sample server included in the download are designed to run on any platform.
+# An ASP.NET Core web app with Azure AD B2C 
+This sample shows how to build an MVC web application that performs identity management with Azure AD B2C using the ASP.Net Core OpenID Connect middleware.  It assumes you have some familiarity with Azure AD B2C.  If you'd like to learn all that B2C has to offer, start with our documentation at [aka.ms/aadb2c](http://aka.ms/aadb2c). 
 
-We've released all of the source code for this example in GitHub under an MIT license, so feel free to clone (or even better, fork!) and provide feedback on the forums.
+The app is a dead simple web application that performs three functions: sign-in, sign-up, and sign-out.  It is intended to help get you started with Azure AD B2C in a ASP.NET Core application, giving you the necessary tools to execute Azure AD B2C policies & securely identify uses in your application.  
 
+## How To Run This Sample
 
-## Quick Start
+Getting started is simple! To run this sample you will need:
 
-Getting started with the sample is easy. It is configured to run out of the box with minimal setup.
+- To install .NET Core for Windows by following the instructions at [dot.net/core](http://dot.net/core), which will include Visual Studio 2017.
+- An Internet connection
+- An Azure subscription (a free trial is sufficient)
 
-### Step 1: Register a web application in B2C Azure AD Tenant
-
-If you don't have an Azure AD B2C Tenant yet, please [create one](https://azure.microsoft.com/en-us/documentation/articles/active-directory-b2c-get-started/).
-
-Next let's register a web application in your tenant.
-
-* In the main page of your tenant, click `Manage B2C settings`, and you will be redirected to the settings page.
-
-* Click `Applications`, then click `Add`. Enter a name like 'my_b2c_app', and switch the `Web App / Web API` option to yes. After that, enter 'http://localhost:3000/auth/openid/return' into the `Reply URL` field. Then click `Generate key` to generate a app key, and save it somewhere. This app key is the client secret of your application. Now click `Create` button to finish registration.
-
-* Click the application you just created, copy the `Application ID` field and save it somewhere. This value is the clientID of your application.
-
-* Now let's add some policies we will use for this sample. In the setting page, add a sign-in policy, a sign-up poligy, a profile-editing policy and a password-reset policy. When you add the policies, use the names 'signin', 'signup', 'updateprofile' and 'resetpassword' respectively. For `Identity providers`, choose `Email signup`; for `Application claims`, choose `Email Addresses`, `User's Object ID` and any other claims you want; for `Sign-up attributes`, choose `Email Address` and anything else you like.
-
-* Now we have a B2C web application and policies registered. Note that Azure AD adds a 'B2C_1_' prefix automatically to all policy names, so the policy names we will use are actually 'B2C_1_signin', 'B2C_1_signup', 'B2C_1_updateprofile' and 'B2C_1_resetpassword'. 
-
-### Step 2: Download node.js for your platform
-To successfully use this sample, you need a working installation of Node.js.
-
-### Step 3: Download the Sample application and modules
-
-Next, clone the sample repo and install the NPM.
+### Step 1:  Clone or download this repository
 
 From your shell or command line:
 
-* `$ git clone git@github.com:AzureADQuickStarts/B2C-WebApp-OpenIDConnect-NodeJS.git`
-* `$ npm install`
+```powershell
+git clone https://github.com/Azure-Samples/active-directory-dotnet-webapp-openidconnect-aspnetcore-b2c.git
+```
 
-### Step 4: Configure your server
+### [OPTIONAL] Step 2: Get your own Azure AD B2C tenant
 
-* Provide the parameters in `exports.creds` in config.js as instructed.
+You can also modify the sample to use your own Azure AD B2C tenant.  First, you'll need to create an Azure AD B2C tenant by following [these instructions](https://azure.microsoft.com/documentation/articles/active-directory-b2c-get-started).
 
-* Update `exports.destroySessionUrl` in config.js, using your tenant name and signin policy name. If you want to redirect the users to a different url after they log out, update the  `post_logout_redirect_uri` part as well.
+> *IMPORTANT*: if you choose to perform one of the optional steps, you have to perform ALL of them for the sample to work as expected.
 
-* Set `exports.useMongoDBSessionStore` in config.js to false, if you want to use the
-default session store for `express-session`. Note that the default session store is
-not suitable for production, you must use mongoDB or other [compatible session stores](https://github.com/expressjs/session#compatible-session-stores).
+### [OPTIONAL] Step 3: Create your own policies
 
-* Update `exports.databaseUri`, if you want to use mongoDB session store and a different database uri.
+This sample uses three types of policies: a unified sign-up/sign-in policy, a profile editing policy and a password reset policy.  Create one policy of each type by following [the instructions here](https://azure.microsoft.com/documentation/articles/active-directory-b2c-reference-policies).  You may choose to include as many or as few identity providers as you wish.
 
-* Update `exports.mongoDBSessionMaxAge`. Here you can specify how long you want
-to keep a session in mongoDB. The unit is second(s).
+If you already have existing policies in your Azure AD B2C tenant, feel free to re-use those.  No need to create new ones just for this sample.
 
-### Step 5: Run the application
+### [OPTIONAL] Step 4: Create your own Web API
 
-* Start mongoDB service.
+This sample calls an API at https://fabrikamb2chello.azurewebsites.net which has the same code as the sample [Node.js Web API with Azure AD B2C](https://github.com/Azure-Samples/active-directory-b2c-javascript-nodejs-webapi). You'll need your own API or at the very least, you'll need to [register a Web API with Azure AD B2C](https://docs.microsoft.com/azure/active-directory-b2c/active-directory-b2c-app-registration#register-a-web-api) so that you can define the scopes that your single page application will request access tokens for. 
 
-If you are using mongoDB session store in this app, you have to install mongoDB and start the service first. If you are using the default session store, you can skip this step.
+Your web API registration should include the following information:
 
-* Run the app.
+- Enable the **Web App/Web API** setting for your application.
+- Set the **Reply URL** to the appropriate value indicated in the sample or provide any URL if you're only doing the web api registration, for example `https://myapi`.
+- Make sure you also provide a **AppID URI**, for example `demoapi`, this is used to construct the scopes that are configured in you single page application's code.
+- (Optional) Once you're app is created, open the app's **Published Scopes** blade and add any extra scopes you want.
+- Copy the **AppID URI** and **Published Scopes values**, so you can input them in your application's code.
 
-Use the following command in terminal.
+### [OPTIONAL] Step 5: Create your own Web app
 
-* `$ node app.js`
+Now you need to [register your web app in your B2C tenant](https://docs.microsoft.com/azure/active-directory-b2c/active-directory-b2c-app-registration#register-a-web-application), so that it has its own Application ID. Don't forget to grant your application API Access to the web API you registered in the previous step.
 
-**Is the server output hard to understand?:** We use `bunyan` for logging in this sample. The console won't make much sense to you unless you also install bunyan and run the server like above but pipe it through the bunyan binary:
+Your native application registration should include the following information:
 
-* `$ npm install -g bunyan`
-* `$ node app.js | bunyan`
+- Enable the **Web App/Web API** setting for your application.
+- Set the **Reply URL** to `https://localhost:5000/signin-oidc`.
+- Once your app is created, open the app's **Keys** blade and click on **Generate Key** and **Save**, copy this key so that you can used it in the next step.
+- Once your app is created, open the app's **API access** blade and **Add** the API you created in the previous step.
+- Copy the Application ID generated for your application, so you can use it in the next step.
 
-### You're done!
+### [OPTIONAL] Step 6: Configure the sample with your app coordinates
 
-You will have a server successfully running on `http://localhost:3000`.
+1. Open the solution in Visual Studio.
+1. Open the `appsettings.json` file.
+1. Find the assignment for `Tenant` and replace the value with your tenant name.
+1. Find the assignment for `ClientID` and replace the value with the Application ID from Step 5.
+1. Find the assignment for each of the policies `XPolicyId` and replace the names of the policies you created in Step 3.
+1. Find the assignment for `ClientSecret` and replace the value with App Key you created in Step 5.
+1. Find the assignment for `ApiUrl` and replace the value with the URL of the API that you registered in Step 4.
+1. Find the assignment for the `ApiScopes` and replace the scopes with those you created in Step 4.
 
-### Acknowledgements
+```json
+{
+  "Authentication": {
+    "AzureAdB2C": {
+      "ClientId": "90c0fe63-bcf2-44d5-8fb7-b8bbc0b29dc6",
+      "Tenant": "fabrikamb2c.onmicrosoft.com",
+      "SignUpSignInPolicyId": "b2c_1_susi",
+      "ResetPasswordPolicyId": "b2c_1_reset",
+      "EditProfilePolicyId": "b2c_1_edit_profile",
+      "RedirectUri": "http://localhost:5000/signin-oidc",
+      "ClientSecret" : "v0WzLXB(uITV5*Aq",
+      "ApiUrl": "https://fabrikamb2chello.azurewebsites.net/hello",
+      "ApiScopes": "https://fabrikamb2c.onmicrosoft.com/demoapi/demo.read"
+    }
+  }
+}
+```
 
-We would like to acknowledge the folks who own/contribute to the following projects for their support of Azure Active Directory and their libraries that were used to build this sample. In places where we forked these libraries to add additional functionality, we ensured that the chain of forking remains intact so you can navigate back to the original package. Working with such great partners in the open source community clearly illustrates what open collaboration can accomplish. Thank you!
+### Step 7:  Run the sample
+
+Clean the solution, rebuild the solution, and run it.  You can now sign up & sign in to your application using the accounts you configured in your respective policies.
+
+## About the code
+
+Here there's a quick guide to the most interesting authentication related bits of the sample.
+
+### Sign in 
+
+As it is standard practice for ASP.NET Core MVC apps, the sign in functionality is implemented with the OpenID Connect OWIN middleware. Here there's a relevant snippet from the middleware initialization:  
+
+```csharp
+  // In Startup.cs
+  public void ConfigureServices(IServiceCollection services)
+  {
+    //...
+    services.Configure<AzureAdB2COptions>(Configuration.GetSection("Authentication:AzureAdB2C"));
+    services.AddSingleton<IConfigureOptions<OpenIdConnectOptions>, OpenIdConnectOptionsSetup>();
+  }
+  
+  // In OpenIdConnectOptionsSetup.cs
+  public void Configure(OpenIdConnectOptions options)
+  {
+    options.ClientId = AzureAdB2COptions.ClientId;
+    options.Authority = AzureAdB2COptions.Authority;
+    options.UseTokenLifetime = true;
+    options.TokenValidationParameters = new TokenValidationParameters() { NameClaimType = "name" };
+    options.Events = new OpenIdConnectEvents()
+    {
+      OnRedirectToIdentityProvider = OnRedirectToIdentityProvider,
+      OnRemoteFailure = OnRemoteFailure,
+      OnAuthorizationCodeReceived = OnAuthorizationCodeReceived
+    };
+  }
+  
+  // In AzureAdB2COptions.cs
+  public class AzureAdB2COptions
+  {
+    public const string PolicyAuthenticationProperty = "Policy";
+
+    public AzureAdB2COptions()
+    {
+      AzureAdB2CInstance = "https://login.microsoftonline.com/tfp";
+    }
+
+    public string ClientId { get; set; }
+    public string AzureAdB2CInstance { get; set; }
+    public string Tenant { get; set; }
+    public string SignUpSignInPolicyId { get; set; }
+    public string SignInPolicyId { get; set; }
+    public string SignUpPolicyId { get; set; }
+    public string ResetPasswordPolicyId { get; set; }
+    public string EditProfilePolicyId { get; set; }
+
+    public string DefaultPolicy => SignUpSignInPolicyId;
+    public string Authority => $"{AzureAdB2CInstance}/{Tenant}/{DefaultPolicy}/v2.0";
+    
+    public string ClientSecret { get; set; }
+    public string ApiUrl { get; set; }
+    public string ApiScopes { get; set; }
+  }
+```
+Important things to notice:
+- The Authority points is constructed using the **tfp** path, the tenant name and the default (sign-up/sign-in) policy.
+- The OnRedirectToIdentityProvider notification is used in order to support EditProfile and Password Reset.
+- The OnRemoteFailure notification is used in order to support Password Reset.
+- The OnAuthorizationCodeReceived notification is used to redeem the access code using MSAL.
+
+### Initial token acquisition
+
+This sample makes use of OpenId Connect hybrid flow, where at authentication time the app receives both sign in info (the id_token) and artifacts (in this case, an authorization code) that the app can use for obtaining an access token. That token can be used to access other resources - in this sample, the a Demo web API which echoes back the user's name.
+This sample shows how to use MSAL to redeem the authorization code into an access token, which is saved in a cache along with any other useful artifact (such as associated refresh_tokens) so that it can be used later on in the application.
+The redemption takes place in the `AuthorizationCodeReceived` notification of the authorization middleware. Here there's the relevant code:
+
+```csharp
+// Use MSAL to swap the code for an access token
+// Extract the code from the response notification
+var code = context.ProtocolMessage.Code;
+
+string signedInUserID = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
+IConfidentialClientApplication cca = ConfidentialClientApplicationBuilder.Create(AzureAdB2COptions.ClientId)
+    .WithB2CAuthority(AzureAdB2COptions.Authority)
+    .WithRedirectUri(AzureAdB2COptions.RedirectUri)
+    .WithClientSecret(AzureAdB2COptions.ClientSecret)
+    .Build();
+ new MSALStaticCache(signedInUserID, context.HttpContext).EnablePersistence(cca.UserTokenCache);
+
+try
+{
+    AuthenticationResult result = await cca.AcquireTokenByAuthorizationCode(AzureAdB2COptions.ApiScopes.Split(' '), code)
+        .ExecuteAsync();
 
 
-## About The Code
+    context.HandleCodeRedemption(result.AccessToken, result.IdToken);
+}
+```
 
-Code hosted on GitHub under MIT license
+Important things to notice:
+- The `IConfidentialClientApplication` is the interface that MSAL uses to model the application. As such, it is initialized with the main application's coordinates.
+- `MSALStaticCache` is a sample implementation of a custom MSAL token cache, which saves tokens in memory. In a real-life application, you would likely want to save tokens in a long lived store instead, so that you don't need to retrieve new ones more often than necessary. For examples of such caches see [ASP.NET Core Web app tutorial | Token caches](https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/tree/master/2-WebApp-graph-user/2-2-TokenCache)
+- The scope requested by `AcquireTokenByAuthorizationCode` is just the one required for invoking the API targeted by the application as part of its essential features. We'll see later that the app allows for extra scopes, but you can ignore those at this point. 
+
+### Using access tokens in the app, handling token expiration
+
+The `Api` action in the `HomeController` class demonstrates how to take advantage of MSAL for getting access to protected API easily and securely. Here there's the relevant code:
+
+```csharp
+// Retrieve the token with the specified scopes
+var scope = AzureAdB2COptions.ApiScopes.Split(' ');
+string signedInUserID = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+IConfidentialClientApplication cca =
+ConfidentialClientApplicationBuilder.Create(AzureAdB2COptions.ClientId)
+    .WithRedirectUri(AzureAdB2COptions.RedirectUri)
+    .WithClientSecret(AzureAdB2COptions.ClientSecret)
+    .WithB2CAuthority(AzureAdB2COptions.Authority)
+    .Build();
+new MSALStaticCache(signedInUserID, this.HttpContext).EnablePersistence(cca.UserTokenCache);
+
+var accounts = await cca.GetAccountsAsync();
+AuthenticationResult result = await cca.AcquireTokenSilent(scope, accounts.FirstOrDefault())
+    .ExecuteAsync();
+```
+
+The idea is very simple. The code creates a new instance of `IConfidentialClientApplication` with the exact same coordinates as the ones used when redeeming the authorization code at authentication time. In particular, note that the exact same cache is used.
+That done, all you need to do is to invoke `AcquireTokenSilent`, asking for the scopes you need. MSAL will look up the cache and return any cached token which match with the requirement. If such access tokens are expired or no suitable access tokens are present, but there is an associated refresh token, MSAL will automatically use that to get a new access token and return it transparently.    
+
+In the case in which refresh tokens are not present or they fail to obtain a new access token, MSAL will throw `MsalUiRequiredException`. That means that in order to obtain the requested token, the user must go through an interactive experience.
