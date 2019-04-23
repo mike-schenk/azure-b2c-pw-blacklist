@@ -30,5 +30,8 @@ namespace WebApp_OpenIDConnect_DotNet
         public string ClientSecret { get; set; }
         public string ApiUrl { get; set; }
         public string ApiScopes { get; set; }
+
+        public string GraphApiClientId { get; set; }
+        public string GraphApiClientSecret { get; set; }
     }
 }

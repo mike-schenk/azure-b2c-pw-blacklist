@@ -51,8 +51,15 @@ namespace WebApp_OpenIDConnect_DotNet
                 {
                     OnRedirectToIdentityProvider = OnRedirectToIdentityProvider,
                     OnRemoteFailure = OnRemoteFailure,
-                    OnAuthorizationCodeReceived = OnAuthorizationCodeReceived
+                    OnAuthorizationCodeReceived = OnAuthorizationCodeReceived,
+                    OnTokenValidated = OnTokenValidated
                 };
+            }
+
+            private Task OnTokenValidated(TokenValidatedContext arg)
+            {
+                arg.SecurityToken.Claims.ToString();
+                return Task.CompletedTask;
             }
 
             public void Configure(OpenIdConnectOptions options)
@@ -122,7 +129,7 @@ namespace WebApp_OpenIDConnect_DotNet
 
                     context.HandleCodeRedemption(result.AccessToken, result.IdToken);
                 }
-                catch (Exception ex)
+                catch
                 {
                     //TODO: Handle
                     throw;

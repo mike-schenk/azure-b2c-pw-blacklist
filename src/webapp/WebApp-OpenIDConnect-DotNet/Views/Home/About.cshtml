@@ -7,16 +7,19 @@
 @using System.Security.Claims
 
 <table class="table-hover table-condensed table-striped">
-    <tr>
-        <th>Claim Type</th>
-        <th>Claim Value</th>
-    </tr>
+  <tr>
+    <th>Claim Type</th>
+    <th>Claim Value</th>
+  </tr>
 
-    @foreach (Claim claim in User.Claims)
-    {
-        <tr>
-            <td>@claim.Type</td>
-            <td>@claim.Value</td>
-        </tr>
-    }
+  @foreach (Claim claim in User.Claims)
+  {
+    <tr>
+      <td>@claim.Type</td>
+      <td>@claim.Value</td>
+    </tr>
+  }
 </table>
+<h2>
+  <a asp-area="" asp-controller="Home" asp-action="Delete">Delete my account</a>
+</h2>

@@ -18,6 +18,7 @@ namespace WebApp_OpenIDConnect_DotNet
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddUserSecrets("bae878cb-55e2-44f0-81fd-80ff8cb98911")
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
@@ -29,6 +30,8 @@ namespace WebApp_OpenIDConnect_DotNet
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddHttpClient();
 
             services.AddAuthentication(sharedOptions =>
             {

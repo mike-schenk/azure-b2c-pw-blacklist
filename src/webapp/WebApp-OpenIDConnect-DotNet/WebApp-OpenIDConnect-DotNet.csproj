@@ -2,8 +2,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>WebApp_OpenIDConnect_DotNet</RootNamespace>
+    <UserSecretsId>bae878cb-55e2-44f0-81fd-80ff8cb98911</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="3.0.3-preview" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />

@@ -17,6 +17,7 @@ module.exports = async function (context, req) {
         var shaPrefix = fullShaString.substring(0, 5);
         var shaSuffix = fullShaString.substring(5);
 
+        // see the following for docs of the API we're calling: https://haveibeenpwned.com/API/v2#PwnedPasswords
         // retrieve the pwned password hash suffixes for this prefix.
         var candidates = await getContent('https://api.pwnedpasswords.com/range/' + shaPrefix);
         // now see if ours is in there.
