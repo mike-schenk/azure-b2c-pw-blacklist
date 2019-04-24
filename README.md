@@ -35,6 +35,12 @@ In `TrustFrameworkExtensions.xml`:
 * The `LocalAccountSignUpWithLogonEmail` technical profile was extended to execute the `API-AllowedPassword` technical profile as a validation profile. It's important that the new validation profile executes _before_  `AAD-UserWriteUsingLogonEmail` which is the validation technical profile specified in the base.
 * Just like the previous point, the `LocalAccountWritePasswordUsingObjectId` was extended with the new validation technical profile.
 
+The blacklist of passwords is the over 550 million passwords collected at Troy Hunt's haveibeenpwned service. Because the haveibeenpwned API requires logic that an IEF technical profile can't do, that logic was written into the blacklist API Azure function app.
+
+The technical profile calls this Azure function, passing the user's desired password. The function then performs the requisite hash and substring, calls https://api.pwnedpasswords.com and looks for a match. If a match is found, it returns a failing HTTP status code and "userMessage". When the technical profile gets the failing status code, it displays the user message to the end-user in the browser.
+
+A localized or application-specific user message can optionally be supplied to the blacklist API through a `failMessage` claim.
+
 ## Possible improvements
 
 * The blacklist API should check the password against a list of application-specific disallwed words.
