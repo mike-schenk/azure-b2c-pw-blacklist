@@ -16,6 +16,8 @@ This repository contains three parts in subdirectories of the `src` directory
 
 ## How it was implemented
 
+### Disabled "strong password"
+
 First, Azure AD B2C's "strong password" requirement had to be disabled.
 
 In `TrustFrameworkBase.xml`:
@@ -24,6 +26,8 @@ In `TrustFrameworkBase.xml`:
   * To remove all the special character requirements, leaving only a min/max length check.
   * The maximum length was extended from 16 to 64 characters.
 * "DisableStrongPassword" was added to the persisted `passwordPolicies` claim in both the `AAD-UserWriteUsingLogonEmail` and `AAD-UserWritePasswordUsingObjectId` technical profiles.
+
+### Inserted the REST technical profile
 
 Then, the signup and reset password flows were modified to call a new REST service in a validation technical profile before writing to the directory.
 
@@ -35,6 +39,8 @@ In `TrustFrameworkExtensions.xml`:
 * The `LocalAccountSignUpWithLogonEmail` technical profile was extended to execute the `API-AllowedPassword` technical profile as a validation profile. It's important that the new validation profile executes _before_  `AAD-UserWriteUsingLogonEmail` which is the validation technical profile specified in the base.
 * Just like the previous point, the `LocalAccountWritePasswordUsingObjectId` was extended with the new validation technical profile.
 
+### Implemented the blacklist API
+
 The blacklist of passwords is the over 550 million passwords collected at Troy Hunt's haveibeenpwned service. Because the haveibeenpwned API requires logic that an IEF technical profile can't do, that logic was written into the blacklist API Azure function app.
 
 The technical profile calls this Azure function, passing the user's desired password. The function then performs the requisite hash and substring, calls https://api.pwnedpasswords.com and looks for a match. If a match is found, it returns a failing HTTP status code and "userMessage". When the technical profile gets the failing status code, it displays the user message to the end-user in the browser.
@@ -43,7 +49,7 @@ A localized or application-specific user message can optionally be supplied to t
 
 ## Possible improvements
 
-* The blacklist API should check the password against a list of application-specific disallwed words.
+* The blacklist API should check the password against a list of application-specific disallowed words.
   * That list shouldn't be hard-coded into the API, maybe it should be passed-in by the caller.
 * The blacklist API should allow the caller to say that passwords which appeared up to _n_ times in breaches are still allowed.
-  * call the blacklist API directly from the (customized) UI asynchronously so the user doesn't have to click "continue" before being told the password is disallowed.
+* Call the blacklist API directly from the (customized) UI asynchronously so the user doesn't have to click "continue" before being told the password is disallowed.
